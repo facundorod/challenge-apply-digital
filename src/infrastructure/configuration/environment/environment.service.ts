@@ -7,6 +7,22 @@ import { ConfigService } from '@nestjs/config';
 export class NestConfigService implements EnvironmentService {
   constructor(private readonly configService: ConfigService) {}
 
+  getContentFulAPIURL(): string {
+    return this.configService.getOrThrow<string>('CONTENTFUL_API_URL');
+  }
+  getContentFulAPISpaceId(): string {
+    return this.configService.getOrThrow<string>('CONTENTFUL_API_SPACEID');
+  }
+  getContentFulAPIAccessToken(): string {
+    return this.configService.getOrThrow<string>('CONTENTFUL_API_ACCESSTOKEN');
+  }
+  getContentFulAPIEnvironment(): string {
+    return this.configService.getOrThrow<string>('CONTENTFUL_API_ENVIRONMENT');
+  }
+  getContentFulAPIContentType(): string {
+    return this.configService.getOrThrow<string>('CONTENTFUL_API_CONTENTTYPE');
+  }
+
   getAppEnv(): AppEnv {
     return this.configService.getOrThrow<AppEnv>('APP_ENV');
   }
