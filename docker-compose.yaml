@@ -1,0 +1,41 @@
+version: "3.8"
+services:
+  db:
+    container_name: challenge_db
+    image: postgres:15.8-alpine
+    ports:
+      - ${DB_PORT}:5432
+    environment:
+        POSTGRES_PASSWORD: ${DB_PASSWORD}
+        POSTGRES_USER: ${DB_USERNAME}
+        POSTGRES_DB: ${DB_NAME}
+    env_file:
+      - path: .env
+        required: true
+    networks:
+        - challenge_network
+    volumes: 
+      - challengedb:/var/lib/postgresql/data
+  
+  api: 
+    container_name: challenge_api
+    image: challenge-api
+    restart: always
+    build:
+        context: .
+        dockerfile: Dockerfile.dev
+    depends_on:
+      - db
+    env_file:
+      - path: .env
+        required: true
+    ports:
+      - 3000:3000
+    networks:
+      - challenge_network
+
+networks:
+  challenge_network:
+    driver: bridge
+volumes:
+  challengedb:
