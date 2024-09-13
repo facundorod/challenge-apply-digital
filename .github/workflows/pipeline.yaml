@@ -51,6 +51,9 @@ jobs:
         strategy:
             matrix:
                 node-version: ['21.x']
+        env:
+          APP_ENV: "test"
+          DATABASE_URI: ${{ secrets.DATABASE_URI }}
         steps:
             - uses: actions/checkout@v4
             - name: Use Node.js ${{ matrix.node-version }}
