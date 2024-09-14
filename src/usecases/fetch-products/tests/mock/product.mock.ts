@@ -39,17 +39,17 @@ const mapProductToContentfulApiItem = (
         },
       },
       locale: 'en-US',
-      fields: {
-        sku: product.getSku(),
-        name: product.getName(),
-        brand: product.getBrand(),
-        model: product.getModel(),
-        category: product.getCategory(),
-        color: product.getColor(),
-        price: product.getPrice(),
-        currency: product.getCurrency(),
-        stock: product.getStock(),
-      },
+    },
+    fields: {
+      sku: product.getSku(),
+      name: product.getName(),
+      brand: product.getBrand(),
+      model: product.getModel(),
+      category: product.getCategory(),
+      color: product.getColor(),
+      price: product.getPrice(),
+      currency: product.getCurrency(),
+      stock: product.getStock(),
     },
   };
 };

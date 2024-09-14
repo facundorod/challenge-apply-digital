@@ -25,8 +25,10 @@ export class FetchProducts implements FetchProductsUseCase {
       await this.httpService.get<ContentFulApiDTO>(apiUrl);
 
     const productsToInsert = this.getProductsToInsert(productsApi);
-
     if (productsToInsert.length) {
+      this.logger.debug(
+        `Trying to insert ${productsToInsert.length} products...`,
+      );
       await this.productRepository.bulkInsert(productsToInsert);
       this.logger.debug(`Bulk insert finished`);
     } else this.logger.debug(`There are no products to insert`);
@@ -44,7 +46,7 @@ export class FetchProducts implements FetchProductsUseCase {
   private getProductsToInsert(productsApi: ContentFulApiDTO): Product[] {
     return productsApi?.items.length
       ? productsApi.items.map(
-          (value: ContentFulApiItems) => new Product(value.sys.fields),
+          (value: ContentFulApiItems) => new Product(value.fields),
         )
       : [];
   }

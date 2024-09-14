@@ -11,9 +11,16 @@ import { LoggerService } from '@/domain/ports/logger/logger.port';
 import { HTTPService } from '@/domain/ports/httpService/httpService.port';
 import { ProductRepository } from '@/domain/ports/repositories/product.repository';
 import { EnvironmentService } from '@/domain/ports/configuration/environment.port';
+import { AxiosModule } from '@/infrastructure/adapters/http-client/axios/axios.module';
+import { RepositoriesModule } from '@/infrastructure/adapters/repositories/repositories.module';
 
 @Module({
-  imports: [ConfigurationModule, WinstonModule],
+  imports: [
+    ConfigurationModule,
+    WinstonModule,
+    AxiosModule,
+    RepositoriesModule,
+  ],
 })
 export class UsecaseProxyModule {
   static readonly FETCH_PRODUCTS_USE_CASE = 'FETCH_PRODUCTS_USECASE';

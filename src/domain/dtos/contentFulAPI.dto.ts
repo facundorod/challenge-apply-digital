@@ -40,8 +40,8 @@ export type ContentFulApiItems = {
       };
     };
     locale: string;
-    fields: ContentFulApiProduct;
   };
+  fields: ContentFulApiProduct;
 };
 
 export type ContentFulApiProduct = {

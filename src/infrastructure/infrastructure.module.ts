@@ -5,6 +5,7 @@ import { AxiosModule } from './adapters/http-client/axios/axios.module';
 import { WinstonModule } from './adapters/logger/winston/winston.module';
 import { RepositoriesModule } from './adapters/repositories/repositories.module';
 import { UsecaseProxyModule } from './proxy/usecase/usecase-proxy.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { UsecaseProxyModule } from './proxy/usecase/usecase-proxy.module';
     AxiosModule,
     RepositoriesModule,
     UsecaseProxyModule,
+    JobsModule,
   ],
 })
 export class InfrastructureModule {}
