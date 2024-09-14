@@ -41,6 +41,6 @@ export class ProductTypeOrmRepository implements ProductRepository {
       },
     );
 
-    await this.productRepo.insert(productsEntities);
+    await this.productRepo.save(productsEntities);
   }
 }

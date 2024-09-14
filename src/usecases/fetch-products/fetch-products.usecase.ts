@@ -18,7 +18,7 @@ export class FetchProducts implements FetchProductsUseCase {
   ) {}
 
   async execute(): Promise<void> {
-    this.logger.debug(`Executing Fetch products usecase...`);
+    this.logger.log(`Executing Fetch products usecase...`);
     const apiUrl = this.getAPIUrl();
 
     const productsApi: ContentFulApiDTO =
@@ -26,12 +26,12 @@ export class FetchProducts implements FetchProductsUseCase {
 
     const productsToInsert = this.getProductsToInsert(productsApi);
     if (productsToInsert.length) {
-      this.logger.debug(
+      this.logger.log(
         `Trying to insert ${productsToInsert.length} products...`,
       );
       await this.productRepository.bulkInsert(productsToInsert);
-      this.logger.debug(`Bulk insert finished`);
-    } else this.logger.debug(`There are no products to insert`);
+      this.logger.log(`Bulk insert finished`);
+    } else this.logger.log(`There are no products to insert`);
   }
 
   private getAPIUrl(): string {
