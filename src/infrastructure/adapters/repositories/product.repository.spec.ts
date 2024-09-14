@@ -145,7 +145,7 @@ describe('ProductTypeOrmRepository', () => {
 
     await repository.bulkInsert(products);
 
-    expect(productRepoMock.insert).toHaveBeenCalledTimes(1);
-    expect(productRepoMock.insert).toHaveBeenCalledWith(expect.any(Array));
+    expect(productRepoMock.save).toHaveBeenCalledTimes(1);
+    expect(productRepoMock.save).toHaveBeenCalledWith(expect.any(Array));
   });
 });
