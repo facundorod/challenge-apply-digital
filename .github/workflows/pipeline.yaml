@@ -54,6 +54,11 @@ jobs:
         env:
           APP_ENV: "test"
           DATABASE_URI: ${{ secrets.DATABASE_URI }}
+          CONTENTFUL_API_ACCESSTOKEN: ${{ secrets.CONTENTFUL_API_ACCESSTOKEN }}
+          CONTENTFUL_API_CONTENTTYPE: ${{ secrets.CONTENTFUL_API_CONTENTTYPE }}
+          CONTENTFUL_API_ENVIRONMENT: ${{ secrets.CONTENTFUL_API_ENVIRONMENT }}
+          CONTENTFUL_API_SPACEID: ${{ secrets.CONTENTFUL_API_SPACEID }}
+          CONTENTFUL_API_URL: ${{ secrets.CONTENTFUL_API_URL }}
         steps:
             - uses: actions/checkout@v4
             - name: Use Node.js ${{ matrix.node-version }}
