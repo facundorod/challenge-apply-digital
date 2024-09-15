@@ -82,7 +82,7 @@ describe('ProductTypeOrmRepository', () => {
 
     expect(productRepoMock.createQueryBuilder).toHaveBeenCalledWith('product');
     expect(queryBuilderMock.andWhere).toHaveBeenCalledWith(
-      'product.name LIKE :name',
+      'lower(product.name) LIKE :name',
       { name: `%${productFilter.name}%` },
     );
     expect(queryBuilderMock.andWhere).toHaveBeenCalledWith(

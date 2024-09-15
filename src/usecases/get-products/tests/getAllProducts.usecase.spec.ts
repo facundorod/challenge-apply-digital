@@ -83,7 +83,7 @@ describe('GetAllProducts', () => {
     expect(result).toEqual({
       data: mockProducts,
       totalItems: 10,
-      page: 0,
+      page: 1,
       totalPages: 2,
     });
 
