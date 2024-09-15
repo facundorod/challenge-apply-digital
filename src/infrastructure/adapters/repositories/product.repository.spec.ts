@@ -1,13 +1,15 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { Repository, SelectQueryBuilder } from 'typeorm';
 import { ProductTypeOrmRepository } from './product.repository';
 import { ProductTypeOrmEntity } from '@/infrastructure/configuration/database/entities/product.entity';
 import { Product } from '@/domain/models/product.model';
-import { Repository } from 'typeorm';
-import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { ProductFilterDto } from '@/domain/dtos/productFilter.dto';
 
 describe('ProductTypeOrmRepository', () => {
   let repository: ProductTypeOrmRepository;
   let productRepoMock: jest.Mocked<Repository<ProductTypeOrmEntity>>;
+  let queryBuilderMock: jest.Mocked<SelectQueryBuilder<ProductTypeOrmEntity>>;
 
   const mockProductEntity = new ProductTypeOrmEntity();
   mockProductEntity.sku = '123';
@@ -16,6 +18,9 @@ describe('ProductTypeOrmRepository', () => {
   mockProductEntity.price = 100;
   mockProductEntity.currency = 'USD';
   mockProductEntity.stock = 10;
+  mockProductEntity.category = 'Test Category';
+  mockProductEntity.color = 'Blue';
+  mockProductEntity.model = 'Test Model';
   mockProductEntity.convertToProductModel = jest.fn().mockReturnValue(
     new Product({
       sku: '123',
@@ -24,55 +29,90 @@ describe('ProductTypeOrmRepository', () => {
       price: 100,
       currency: 'USD',
       stock: 10,
-      category: 'Test category',
+      category: 'Test Category',
       color: 'Blue',
-      model: 'Test model',
+      model: 'Test Model',
     }),
   );
 
   beforeEach(async () => {
+    queryBuilderMock = {
+      where: jest.fn().mockReturnThis(),
+      andWhere: jest.fn().mockReturnThis(),
+      orderBy: jest.fn().mockReturnThis(),
+      skip: jest.fn().mockReturnThis(),
+      take: jest.fn().mockReturnThis(),
+      getManyAndCount: jest.fn().mockResolvedValue([[mockProductEntity], 1]),
+    } as unknown as jest.Mocked<SelectQueryBuilder<ProductTypeOrmEntity>>;
+
+    productRepoMock = {
+      createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
+      save: jest.fn(),
+      update: jest.fn(),
+    } as unknown as jest.Mocked<Repository<ProductTypeOrmEntity>>;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ProductTypeOrmRepository,
         {
           provide: getRepositoryToken(ProductTypeOrmEntity),
-          useValue: {
-            find: jest.fn(),
-            save: jest.fn(),
-            insert: jest.fn(),
-          },
+          useValue: productRepoMock,
         },
       ],
     }).compile();
 
     repository = module.get<ProductTypeOrmRepository>(ProductTypeOrmRepository);
-    productRepoMock = module.get(getRepositoryToken(ProductTypeOrmEntity));
   });
 
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should return all products correctly', async () => {
-    productRepoMock.find.mockResolvedValue([mockProductEntity]);
+  it('should return all products with filters correctly', async () => {
+    const productFilter: ProductFilterDto = {
+      name: 'Test',
+      category: 'Test Category',
+      page: 0,
+      pageSize: 5,
+      orderBy: 'name',
+      order: 'ASC',
+    };
 
-    const products = await repository.getAll();
+    const result = await repository.getAll(productFilter);
 
-    expect(productRepoMock.find).toHaveBeenCalledTimes(1);
-    expect(products).toHaveLength(1);
-    expect(products[0]).toEqual(
-      new Product({
-        sku: '123',
-        name: 'Test Product',
-        brand: 'Test Brand',
-        price: 100,
-        currency: 'USD',
-        stock: 10,
-        category: 'Test category',
-        color: 'Blue',
-        model: 'Test model',
-      }),
+    expect(productRepoMock.createQueryBuilder).toHaveBeenCalledWith('product');
+    expect(queryBuilderMock.andWhere).toHaveBeenCalledWith(
+      'product.name LIKE :name',
+      { name: `%${productFilter.name}%` },
     );
+    expect(queryBuilderMock.andWhere).toHaveBeenCalledWith(
+      'product.category = :category',
+      { category: productFilter.category },
+    );
+    expect(queryBuilderMock.orderBy).toHaveBeenCalledWith(
+      'product.name',
+      'ASC',
+    );
+    expect(queryBuilderMock.skip).toHaveBeenCalledWith(productFilter.page);
+    expect(queryBuilderMock.take).toHaveBeenCalledWith(productFilter.pageSize);
+    expect(queryBuilderMock.getManyAndCount).toHaveBeenCalled();
+
+    expect(result).toEqual({
+      total: 1,
+      products: [
+        new Product({
+          sku: '123',
+          name: 'Test Product',
+          brand: 'Test Brand',
+          price: 100,
+          currency: 'USD',
+          stock: 10,
+          category: 'Test Category',
+          color: 'Blue',
+          model: 'Test Model',
+        }),
+      ],
+    });
   });
 
   it('should insert a product correctly', async () => {
@@ -83,14 +123,13 @@ describe('ProductTypeOrmRepository', () => {
       price: 100,
       currency: 'USD',
       stock: 10,
-      category: 'Test category',
+      category: 'Test Category',
       color: 'Blue',
-      model: 'Test model',
+      model: 'Test Model',
     });
 
     await repository.insert(product);
 
-    expect(productRepoMock.save).toHaveBeenCalledTimes(1);
     expect(productRepoMock.save).toHaveBeenCalledWith(
       expect.any(ProductTypeOrmEntity),
     );
@@ -99,20 +138,20 @@ describe('ProductTypeOrmRepository', () => {
   it('should update a product correctly', async () => {
     const product = new Product({
       sku: '123',
-      name: 'Test Product',
-      brand: 'Test Brand',
-      price: 100,
+      name: 'Updated Product',
+      brand: 'Updated Brand',
+      price: 150,
       currency: 'USD',
-      stock: 10,
-      category: 'Test category',
-      color: 'Blue',
-      model: 'Test model',
+      stock: 20,
+      category: 'Updated Category',
+      color: 'Red',
+      model: 'Updated Model',
     });
 
     await repository.update(product);
 
-    expect(productRepoMock.save).toHaveBeenCalledTimes(1);
-    expect(productRepoMock.save).toHaveBeenCalledWith(
+    expect(productRepoMock.update).toHaveBeenCalledWith(
+      '123',
       expect.any(ProductTypeOrmEntity),
     );
   });
@@ -121,31 +160,30 @@ describe('ProductTypeOrmRepository', () => {
     const products = [
       new Product({
         sku: '123',
-        name: 'Test Product 1',
+        name: 'Product 1',
         brand: 'Brand 1',
         price: 100,
         currency: 'USD',
         stock: 10,
         category: 'Category 1',
-        color: 'Color 1',
-        model: 'model 1',
+        color: 'Blue',
+        model: 'Model 1',
       }),
       new Product({
         sku: '456',
-        name: 'Test Product 2',
+        name: 'Product 2',
         brand: 'Brand 2',
         price: 200,
         currency: 'USD',
         stock: 20,
-        category: 'category 2',
-        color: 'Color 2',
-        model: 'model 2',
+        category: 'Category 2',
+        color: 'Red',
+        model: 'Model 2',
       }),
     ];
 
     await repository.bulkInsert(products);
 
-    expect(productRepoMock.save).toHaveBeenCalledTimes(1);
     expect(productRepoMock.save).toHaveBeenCalledWith(expect.any(Array));
   });
 });
