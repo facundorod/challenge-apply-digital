@@ -107,7 +107,7 @@ describe('GetAllProducts', () => {
     expect(result).toEqual({
       data: [],
       totalItems: 0,
-      page: 0,
+      page: 1,
       totalPages: 0,
     });
   });

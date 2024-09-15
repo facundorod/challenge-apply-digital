@@ -24,7 +24,7 @@ export class GetAllProducts implements GetProductsUseCase {
     if (!total)
       return {
         data: [],
-        page: 0,
+        page: 1,
         totalItems: 0,
         totalPages: 0,
       };

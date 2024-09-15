@@ -87,7 +87,7 @@ export class ProductTypeOrmRepository implements ProductRepository {
     }
 
     productQuery.orderBy(
-      `product.${productFilterDTO.orderBy}`,
+      `product.${productFilterDTO.orderBy ?? 'name'}`,
       productFilterDTO.order,
     );
 
