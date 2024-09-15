@@ -32,7 +32,7 @@ export class GetAllProducts implements GetProductsUseCase {
     return {
       data: products,
       totalItems: total,
-      page: productFilter.page,
+      page: productFilter.page == 0 ? 1 : productFilter.page,
       totalPages: Math.ceil(total / productFilter.pageSize),
     };
   }

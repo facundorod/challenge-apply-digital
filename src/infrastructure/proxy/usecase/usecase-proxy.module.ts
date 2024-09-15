@@ -13,6 +13,7 @@ import { ProductRepository } from '@/domain/ports/repositories/product.repositor
 import { EnvironmentService } from '@/domain/ports/configuration/environment.port';
 import { AxiosModule } from '@/infrastructure/adapters/http-client/axios/axios.module';
 import { RepositoriesModule } from '@/infrastructure/adapters/repositories/repositories.module';
+import { GetAllProducts } from '@/usecases/get-products/get-products.usecase';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { RepositoriesModule } from '@/infrastructure/adapters/repositories/repos
 })
 export class UsecaseProxyModule {
   static readonly FETCH_PRODUCTS_USE_CASE = 'FETCH_PRODUCTS_USECASE';
+  static readonly GET_ALL_PRODUCTS_USE_CASE = 'GET_ALL_PRODUCTS_USECASE';
   static register(): DynamicModule {
     return {
       module: UsecaseProxyModule,
@@ -51,8 +53,19 @@ export class UsecaseProxyModule {
               ),
             ),
         },
+        {
+          provide: UsecaseProxyModule.GET_ALL_PRODUCTS_USE_CASE,
+          inject: [WinstonAdapter, ProductTypeOrmRepository],
+          useFactory: (
+            logger: LoggerService,
+            productRepository: ProductRepository,
+          ) => new UseCaseProxy(new GetAllProducts(logger, productRepository)),
+        },
       ],
-      exports: [UsecaseProxyModule.FETCH_PRODUCTS_USE_CASE],
+      exports: [
+        UsecaseProxyModule.FETCH_PRODUCTS_USE_CASE,
+        UsecaseProxyModule.GET_ALL_PRODUCTS_USE_CASE,
+      ],
     };
   }
 }

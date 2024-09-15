@@ -34,7 +34,7 @@ export class ProductTypeOrmRepository implements ProductRepository {
     const productQuery = this.productRepo.createQueryBuilder('product');
 
     if (productFilterDTO.name)
-      productQuery.andWhere('product.name LIKE :name', {
+      productQuery.andWhere('lower(product.name) LIKE :name', {
         name: `%${productFilterDTO.name}%`,
       });
 
