@@ -28,6 +28,7 @@ export class ProductTypeOrmRepository implements ProductRepository {
     productFilterDTO: ProductFilterDto,
   ): Promise<{ total: number; products: Product[] }> {
     const productQueryBuilder = this.getProductQuery(productFilterDTO);
+    productQueryBuilder.andWhere('isDeleted = :deleted', { deleted: false });
 
     const [products, total] = await productQueryBuilder.getManyAndCount();
 

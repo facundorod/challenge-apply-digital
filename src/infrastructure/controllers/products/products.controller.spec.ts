@@ -7,14 +7,14 @@ import { ProductFilterDto } from '@/domain/dtos/productFilter.dto';
 import { Product } from '@/domain/models/product.model';
 import { PaginatedDataDto } from '@/domain/dtos/paginatedData.dto';
 import { RemoveProductUseCase } from '@/usecases/remove-product/remove-product.interface';
-import { RemoveProducts } from '@/usecases/remove-product/remove-product.usecase';
+import { RemoveProduct } from '@/usecases/remove-product/remove-product.usecase';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
   let getAllProductsUseCaseMock: jest.Mocked<UseCaseProxy<GetAllProducts>>;
   let getAllProductsInstanceMock: jest.Mocked<GetAllProducts>;
   let deleteProductUseCaseMock: jest.Mocked<UseCaseProxy<RemoveProductUseCase>>;
-  let deleteProductInstanceMock: jest.Mocked<RemoveProducts>;
+  let deleteProductInstanceMock: jest.Mocked<RemoveProduct>;
 
   beforeEach(async () => {
     getAllProductsInstanceMock = {
@@ -27,7 +27,7 @@ describe('ProductsController', () => {
 
     deleteProductInstanceMock = {
       execute: jest.fn(),
-    } as unknown as jest.Mocked<RemoveProducts>;
+    } as unknown as jest.Mocked<RemoveProduct>;
 
     deleteProductUseCaseMock = {
       getInstance: jest.fn().mockReturnValue(deleteProductInstanceMock),

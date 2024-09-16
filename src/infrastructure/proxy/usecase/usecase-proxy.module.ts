@@ -14,7 +14,7 @@ import { EnvironmentService } from '@/domain/ports/configuration/environment.por
 import { AxiosModule } from '@/infrastructure/adapters/http-client/axios/axios.module';
 import { RepositoriesModule } from '@/infrastructure/adapters/repositories/repositories.module';
 import { GetAllProducts } from '@/usecases/get-products/get-products.usecase';
-import { RemoveProducts } from '@/usecases/remove-product/remove-product.usecase';
+import { RemoveProduct } from '@/usecases/remove-product/remove-product.usecase';
 
 @Module({
   imports: [
@@ -70,7 +70,7 @@ export class UsecaseProxyModule {
           useFactory: (
             logger: LoggerService,
             productRepository: ProductRepository,
-          ) => new UseCaseProxy(new RemoveProducts(logger, productRepository)),
+          ) => new UseCaseProxy(new RemoveProduct(logger, productRepository)),
         },
       ],
       exports: [

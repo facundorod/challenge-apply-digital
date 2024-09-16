@@ -15,6 +15,7 @@ describe('ProductTypeOrmEntity', () => {
     productEntity.price = 399.99;
     productEntity.currency = 'USD';
     productEntity.stock = 50;
+    productEntity.isDeleted = true;
   });
 
   it('should initialize entity fields correctly', () => {
@@ -27,6 +28,7 @@ describe('ProductTypeOrmEntity', () => {
     expect(productEntity.price).toBe(399.99);
     expect(productEntity.currency).toBe('USD');
     expect(productEntity.stock).toBe(50);
+    expect(productEntity.isDeleted).toBe(true);
   });
 
   it('should convert entity to Product model correctly', () => {
@@ -42,5 +44,6 @@ describe('ProductTypeOrmEntity', () => {
     expect(productModel.getPrice()).toBe(399.99);
     expect(productModel.getCurrency()).toBe('USD');
     expect(productModel.getStock()).toBe(50);
+    expect(productModel.getIsDeleted()).toBe(true);
   });
 });

@@ -30,6 +30,9 @@ export class ProductTypeOrmEntity {
   @Column({ type: 'int' })
   stock: number;
 
+  @Column({ type: 'boolean' })
+  isDeleted: boolean = false;
+
   public convertToProductModel(): Product {
     return new Product({
       sku: this.sku,
@@ -41,6 +44,7 @@ export class ProductTypeOrmEntity {
       price: this.price,
       currency: this.currency,
       stock: this.stock,
+      isDeleted: this.isDeleted,
     });
   }
 
@@ -54,5 +58,6 @@ export class ProductTypeOrmEntity {
     this.price = product.getPrice();
     this.currency = product.getCurrency();
     this.stock = product.getStock();
+    this.isDeleted = product.getIsDeleted();
   }
 }
