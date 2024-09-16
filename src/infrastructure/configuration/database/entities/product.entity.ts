@@ -1,5 +1,5 @@
 import { Product } from '@/domain/models/product.model';
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'products' })
 export class ProductTypeOrmEntity {
@@ -30,8 +30,11 @@ export class ProductTypeOrmEntity {
   @Column({ type: 'int' })
   stock: number;
 
-  @Column({ type: 'boolean' })
+  @Column({ type: 'boolean', default: false, name: 'is_deleted' })
   isDeleted: boolean = false;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
 
   public convertToProductModel(): Product {
     return new Product({

@@ -10,4 +10,10 @@ export interface ProductRepository {
   bulkInsert(products: Product[]): Promise<void>;
   getBySku(sku: string): Promise<Product | null>;
   deleteBySku(sku: string): Promise<void>;
+  countDeleted(): Promise<number>;
+  countNotDeleted(): Promise<number>;
+  count(): Promise<number>;
+  countDeletedWithPrice(): Promise<number>;
+  countDeletedByDateRange(startDate: Date, endDate: Date): Promise<number>;
+  getAvgPriceOfNonDeletedProducts(): Promise<number>;
 }
