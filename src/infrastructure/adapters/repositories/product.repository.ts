@@ -13,6 +13,17 @@ export class ProductTypeOrmRepository implements ProductRepository {
     private readonly productRepo: Repository<ProductTypeOrmEntity>,
   ) {}
 
+  async getBySku(sku: string): Promise<Product | null> {
+    const productEntity = await this.productRepo.findOneBy({ sku });
+    if (!productEntity) return null;
+
+    return productEntity.convertToProductModel();
+  }
+
+  async deleteBySku(sku: string): Promise<void> {
+    await this.productRepo.delete({ sku });
+  }
+
   async getAll(
     productFilterDTO: ProductFilterDto,
   ): Promise<{ total: number; products: Product[] }> {

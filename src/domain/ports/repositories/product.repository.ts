@@ -8,4 +8,6 @@ export interface ProductRepository {
   insert(product: Product): Promise<void>;
   update(product: Product): Promise<void>;
   bulkInsert(products: Product[]): Promise<void>;
+  getBySku(sku: string): Promise<Product | null>;
+  deleteBySku(sku: string): Promise<void>;
 }
