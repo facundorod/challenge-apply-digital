@@ -1,7 +1,10 @@
+import { ProductFilterDto } from '@/domain/dtos/productFilter.dto';
 import { Product } from '@/domain/models/product.model';
 
 export interface ProductRepository {
-  getAll(): Promise<Product[]>;
+  getAll(
+    productFilterDTO: ProductFilterDto,
+  ): Promise<{ products: Product[]; total: number }>;
   insert(product: Product): Promise<void>;
   update(product: Product): Promise<void>;
   bulkInsert(products: Product[]): Promise<void>;
