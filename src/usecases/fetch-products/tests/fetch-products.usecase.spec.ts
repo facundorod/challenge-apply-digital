@@ -28,7 +28,7 @@ describe('Fetch products usecase', () => {
       update: jest.fn(),
       deleteBySku: jest.fn(),
       getBySku: jest.fn(),
-    };
+    } as unknown as jest.Mocked<ProductRepository>;
 
     httpClient = {
       delete: jest.fn(),

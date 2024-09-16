@@ -8,6 +8,8 @@ import { Product } from '@/domain/models/product.model';
 import { PaginatedDataDto } from '@/domain/dtos/paginatedData.dto';
 import { RemoveProductUseCase } from '@/usecases/remove-product/remove-product.interface';
 import { RemoveProduct } from '@/usecases/remove-product/remove-product.usecase';
+import { ReportsUseCase } from '@/usecases/reports/reports.interface';
+import { ReportsResponseDTO } from '@/domain/dtos/reportsResponse.dto';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
@@ -15,7 +17,8 @@ describe('ProductsController', () => {
   let getAllProductsInstanceMock: jest.Mocked<GetAllProducts>;
   let deleteProductUseCaseMock: jest.Mocked<UseCaseProxy<RemoveProductUseCase>>;
   let deleteProductInstanceMock: jest.Mocked<RemoveProduct>;
-
+  let reportsUseCaseMock: jest.Mocked<UseCaseProxy<ReportsUseCase>>;
+  let reportInstanceMock: jest.Mocked<ReportsUseCase>;
   beforeEach(async () => {
     getAllProductsInstanceMock = {
       execute: jest.fn(),
@@ -33,6 +36,14 @@ describe('ProductsController', () => {
       getInstance: jest.fn().mockReturnValue(deleteProductInstanceMock),
     } as undefined as jest.Mocked<UseCaseProxy<RemoveProductUseCase>>;
 
+    reportInstanceMock = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<ReportsUseCase>;
+
+    reportsUseCaseMock = {
+      getInstance: jest.fn().mockReturnValue(reportInstanceMock),
+    } as undefined as jest.Mocked<UseCaseProxy<ReportsUseCase>>;
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductsController],
       providers: [
@@ -43,6 +54,10 @@ describe('ProductsController', () => {
         {
           provide: UsecaseProxyModule.DELETE_PRODUCT_USE_CASE,
           useValue: deleteProductUseCaseMock,
+        },
+        {
+          provide: UsecaseProxyModule.REPORTS_USE_CASE,
+          useValue: reportsUseCaseMock,
         },
       ],
     }).compile();
@@ -100,5 +115,22 @@ describe('ProductsController', () => {
     await controller.deleteProduct('11234A');
     expect(deleteProductUseCaseMock.getInstance).toHaveBeenCalled();
     expect(deleteProductInstanceMock.execute).toHaveBeenCalledWith('11234A');
+  });
+
+  it('should call reportsUseCase', async () => {
+    const reportDTO: ReportsResponseDTO = {
+      averagePriceOfNonDeletedProducts: 10,
+      percentageOfDeletedProducts: 1,
+      percentageOfNonDeletedProducts: {
+        customDateRange: 0,
+        withoutPrice: 5,
+        withPrice: 95,
+      },
+    };
+    reportInstanceMock.execute.mockResolvedValue(reportDTO);
+    const requestDTO = { endDate: new Date(), startDate: null };
+    await controller.reports(requestDTO);
+    expect(reportsUseCaseMock.getInstance).toHaveBeenCalled();
+    expect(reportInstanceMock.execute).toHaveBeenCalledWith(requestDTO);
   });
 });
