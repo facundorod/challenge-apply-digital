@@ -8,7 +8,9 @@ async function bootstrap() {
     cors: true,
     logger: new WinstonAdapter(),
   });
-  app.useGlobalPipes(new ValidationPipe({ transform: true }));
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+  );
   app.setGlobalPrefix('/v1/api/');
   await app.listen(3000);
 }
