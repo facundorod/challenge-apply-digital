@@ -4,7 +4,7 @@ import { ProductRepository } from '@/domain/ports/repositories/product.repositor
 import { ProductTypeOrmEntity } from '@/infrastructure/configuration/database/entities/product.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder } from 'typeorm';
+import { Between, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
 
 @Injectable()
 export class ProductTypeOrmRepository implements ProductRepository {
@@ -12,6 +12,39 @@ export class ProductTypeOrmRepository implements ProductRepository {
     @InjectRepository(ProductTypeOrmEntity)
     private readonly productRepo: Repository<ProductTypeOrmEntity>,
   ) {}
+
+  async countDeleted(): Promise<number> {
+    return this.productRepo.count({ where: { isDeleted: true } });
+  }
+
+  async countNotDeleted(): Promise<number> {
+    return this.productRepo.count({ where: { isDeleted: false } });
+  }
+
+  async count(): Promise<number> {
+    return this.productRepo.count();
+  }
+  async countDeletedWithPrice(): Promise<number> {
+    return this.productRepo.count({
+      where: { isDeleted: true, price: MoreThan(0) },
+    });
+  }
+
+  countDeletedByDateRange(startDate: Date, endDate: Date): Promise<number> {
+    return this.productRepo.count({
+      where: { isDeleted: true, createdAt: Between(startDate, endDate) },
+    });
+  }
+
+  async getAvgPriceOfNonDeletedProducts(): Promise<number> {
+    const result = await this.productRepo
+      .createQueryBuilder('product')
+      .select('AVG(product.price)', 'avgPrice')
+      .where('product.isDeleted = :isDeleted', { isDeleted: false })
+      .getRawOne();
+
+    return +result.avgPrice || 0;
+  }
 
   async getBySku(sku: string): Promise<Product | null> {
     const productEntity = await this.productRepo.findOneBy({ sku });
@@ -28,6 +61,7 @@ export class ProductTypeOrmRepository implements ProductRepository {
     productFilterDTO: ProductFilterDto,
   ): Promise<{ total: number; products: Product[] }> {
     const productQueryBuilder = this.getProductQuery(productFilterDTO);
+    productQueryBuilder.andWhere('is_deleted = :deleted', { deleted: false });
 
     const [products, total] = await productQueryBuilder.getManyAndCount();
 

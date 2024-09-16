@@ -1,7 +1,7 @@
 import { LoggerService } from '@/domain/ports/logger/logger.port';
 import { ProductRepository } from '@/domain/ports/repositories/product.repository';
 import { RemoveProductUseCase } from '../remove-product.interface';
-import { RemoveProducts } from '../remove-product.usecase';
+import { RemoveProduct } from '../remove-product.usecase';
 import { ProductNotFound } from '@/domain/errors/productNotFound.error';
 import { Product } from '@/domain/models/product.model';
 
@@ -20,9 +20,10 @@ describe('Remove product usecase', () => {
     productRepository = {
       deleteBySku: jest.fn(),
       getBySku: jest.fn(),
+      update: jest.fn(),
     } as undefined as jest.Mocked<ProductRepository>;
 
-    removeProducts = new RemoveProducts(loggerService, productRepository);
+    removeProducts = new RemoveProduct(loggerService, productRepository);
   });
   afterAll(() => jest.resetAllMocks());
 
@@ -34,21 +35,21 @@ describe('Remove product usecase', () => {
 
   it('should delete the product', async () => {
     const sku = '1123A';
-    productRepository.getBySku.mockResolvedValueOnce(
-      new Product({
-        sku: sku,
-        name: 'Test product',
-        model: 'Test model',
-        category: 'Test category',
-        brand: 'Test brand',
-        color: 'Blue',
-        currency: 'USD',
-        price: 1123,
-        stock: 1,
-      }),
-    );
+    const product = new Product({
+      sku: sku,
+      name: 'Test product',
+      model: 'Test model',
+      category: 'Test category',
+      brand: 'Test brand',
+      color: 'Blue',
+      currency: 'USD',
+      price: 1123,
+      stock: 1,
+    });
+    productRepository.getBySku.mockResolvedValueOnce(product);
+    product.setIsDeleted(true);
     await removeProducts.execute(sku);
 
-    expect(productRepository.deleteBySku).toHaveBeenCalledWith(sku);
+    expect(productRepository.update).toHaveBeenCalledWith(product);
   });
 });

@@ -3,7 +3,7 @@ import { RemoveProductUseCase } from './remove-product.interface';
 import { ProductRepository } from '@/domain/ports/repositories/product.repository';
 import { ProductNotFound } from '@/domain/errors/productNotFound.error';
 
-export class RemoveProducts implements RemoveProductUseCase {
+export class RemoveProduct implements RemoveProductUseCase {
   constructor(
     private readonly loggerService: LoggerService,
     private readonly productRepository: ProductRepository,
@@ -16,8 +16,11 @@ export class RemoveProducts implements RemoveProductUseCase {
 
     if (!product) throw new ProductNotFound();
 
-    await this.productRepository.deleteBySku(productSku);
+    product.setIsDeleted(true);
+    await this.productRepository.update(product);
 
-    this.loggerService.log(`Product ${productSku} deleted successfully`);
+    this.loggerService.log(
+      `Product ${productSku} mark as deleted successfully`,
+    );
   }
 }

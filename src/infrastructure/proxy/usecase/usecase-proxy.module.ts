@@ -14,7 +14,8 @@ import { EnvironmentService } from '@/domain/ports/configuration/environment.por
 import { AxiosModule } from '@/infrastructure/adapters/http-client/axios/axios.module';
 import { RepositoriesModule } from '@/infrastructure/adapters/repositories/repositories.module';
 import { GetAllProducts } from '@/usecases/get-products/get-products.usecase';
-import { RemoveProducts } from '@/usecases/remove-product/remove-product.usecase';
+import { RemoveProduct } from '@/usecases/remove-product/remove-product.usecase';
+import { Reports } from '@/usecases/reports/reports.usecase';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ export class UsecaseProxyModule {
   static readonly FETCH_PRODUCTS_USE_CASE = 'FETCH_PRODUCTS_USECASE';
   static readonly GET_ALL_PRODUCTS_USE_CASE = 'GET_ALL_PRODUCTS_USECASE';
   static readonly DELETE_PRODUCT_USE_CASE = 'DELETE_PRODUCT_USECASE';
+  static readonly REPORTS_USE_CASE = 'REPORTS_USECASE';
 
   static register(): DynamicModule {
     return {
@@ -70,13 +72,22 @@ export class UsecaseProxyModule {
           useFactory: (
             logger: LoggerService,
             productRepository: ProductRepository,
-          ) => new UseCaseProxy(new RemoveProducts(logger, productRepository)),
+          ) => new UseCaseProxy(new RemoveProduct(logger, productRepository)),
+        },
+        {
+          provide: UsecaseProxyModule.REPORTS_USE_CASE,
+          inject: [WinstonAdapter, ProductTypeOrmRepository],
+          useFactory: (
+            logger: LoggerService,
+            productRepository: ProductRepository,
+          ) => new UseCaseProxy(new Reports(logger, productRepository)),
         },
       ],
       exports: [
         UsecaseProxyModule.FETCH_PRODUCTS_USE_CASE,
         UsecaseProxyModule.GET_ALL_PRODUCTS_USE_CASE,
         UsecaseProxyModule.DELETE_PRODUCT_USE_CASE,
+        UsecaseProxyModule.REPORTS_USE_CASE,
       ],
     };
   }

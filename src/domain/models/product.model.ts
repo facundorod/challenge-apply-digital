@@ -8,6 +8,7 @@ export class Product {
   private price: number;
   private currency: string;
   private stock: number;
+  private isDeleted: boolean;
 
   constructor({
     sku,
@@ -19,6 +20,7 @@ export class Product {
     price,
     currency,
     stock,
+    isDeleted = false,
   }) {
     this.setSku(sku);
     this.setName(name);
@@ -29,6 +31,15 @@ export class Product {
     this.setPrice(price);
     this.setCurrency(currency);
     this.setStock(stock);
+    this.setIsDeleted(isDeleted);
+  }
+
+  public setIsDeleted(isDeleted: boolean): void {
+    this.isDeleted = isDeleted;
+  }
+
+  public getIsDeleted(): boolean {
+    return this.isDeleted;
   }
 
   public getSku(): string {

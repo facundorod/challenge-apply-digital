@@ -343,4 +343,64 @@ describe('ProductsController (Integration)', () => {
       });
     });
   });
+  describe('GET /products/reports', () => {
+    it('should return the report with default values when no filters are provided', async () => {
+      const response = await supertest(app.getHttpServer()).get(
+        '/products/reports',
+      );
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('percentageOfDeletedProducts');
+      expect(response.body).toHaveProperty(
+        'percentageOfNonDeletedProducts.withPrice',
+      );
+      expect(response.body).toHaveProperty(
+        'percentageOfNonDeletedProducts.withoutPrice',
+      );
+      expect(response.body).toHaveProperty(
+        'percentageOfNonDeletedProducts.customDateRange',
+      );
+      expect(response.body).toHaveProperty('averagePriceOfNonDeletedProducts');
+    });
+
+    it('should return the report for a specific date range', async () => {
+      const response = await supertest(app.getHttpServer())
+        .get('/products/reports')
+        .query({
+          startDate: '2024-01-01',
+          endDate: '2024-12-31',
+        });
+
+      expect(response.status).toBe(200);
+      expect(
+        response.body.percentageOfNonDeletedProducts.customDateRange,
+      ).toBeDefined();
+      expect(response.body).toHaveProperty('percentageOfDeletedProducts');
+      expect(response.body).toHaveProperty('averagePriceOfNonDeletedProducts');
+    });
+
+    it('should return validation error when the startDate or endDate is invalid', async () => {
+      const response = await supertest(app.getHttpServer())
+        .get('/products/reports')
+        .query({
+          startDate: 'invalid-date',
+          endDate: '2024-12-31',
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message).toContain('startDate must be a valid date');
+    });
+
+    it('should return the report with only the endDate provided', async () => {
+      const response = await supertest(app.getHttpServer())
+        .get('/products/reports')
+        .query({
+          endDate: '2024-12-31',
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('percentageOfDeletedProducts');
+      expect(response.body).toHaveProperty('averagePriceOfNonDeletedProducts');
+    });
+  });
 });
