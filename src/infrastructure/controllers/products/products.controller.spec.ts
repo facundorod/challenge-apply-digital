@@ -6,11 +6,15 @@ import { GetAllProducts } from '@/usecases/get-products/get-products.usecase';
 import { ProductFilterDto } from '@/domain/dtos/productFilter.dto';
 import { Product } from '@/domain/models/product.model';
 import { PaginatedDataDto } from '@/domain/dtos/paginatedData.dto';
+import { RemoveProductUseCase } from '@/usecases/remove-product/remove-product.interface';
+import { RemoveProducts } from '@/usecases/remove-product/remove-product.usecase';
 
 describe('ProductsController', () => {
   let controller: ProductsController;
   let getAllProductsUseCaseMock: jest.Mocked<UseCaseProxy<GetAllProducts>>;
   let getAllProductsInstanceMock: jest.Mocked<GetAllProducts>;
+  let deleteProductUseCaseMock: jest.Mocked<UseCaseProxy<RemoveProductUseCase>>;
+  let deleteProductInstanceMock: jest.Mocked<RemoveProducts>;
 
   beforeEach(async () => {
     getAllProductsInstanceMock = {
@@ -21,12 +25,24 @@ describe('ProductsController', () => {
       getInstance: jest.fn().mockReturnValue(getAllProductsInstanceMock),
     } as undefined as jest.Mocked<UseCaseProxy<GetAllProducts>>;
 
+    deleteProductInstanceMock = {
+      execute: jest.fn(),
+    } as unknown as jest.Mocked<RemoveProducts>;
+
+    deleteProductUseCaseMock = {
+      getInstance: jest.fn().mockReturnValue(deleteProductInstanceMock),
+    } as undefined as jest.Mocked<UseCaseProxy<RemoveProductUseCase>>;
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [ProductsController],
       providers: [
         {
           provide: UsecaseProxyModule.GET_ALL_PRODUCTS_USE_CASE,
           useValue: getAllProductsUseCaseMock,
+        },
+        {
+          provide: UsecaseProxyModule.DELETE_PRODUCT_USE_CASE,
+          useValue: deleteProductUseCaseMock,
         },
       ],
     }).compile();
@@ -77,5 +93,12 @@ describe('ProductsController', () => {
       productFilterDto,
     );
     expect(result).toEqual(mockPaginatedData);
+  });
+
+  it('should call deleteProductUseCase', async () => {
+    deleteProductInstanceMock.execute.mockResolvedValue();
+    await controller.deleteProduct('11234A');
+    expect(deleteProductUseCaseMock.getInstance).toHaveBeenCalled();
+    expect(deleteProductInstanceMock.execute).toHaveBeenCalledWith('11234A');
   });
 });

@@ -26,6 +26,8 @@ describe('Fetch products usecase', () => {
       getAll: jest.fn(),
       insert: jest.fn(),
       update: jest.fn(),
+      deleteBySku: jest.fn(),
+      getBySku: jest.fn(),
     };
 
     httpClient = {

@@ -49,6 +49,8 @@ describe('ProductTypeOrmRepository', () => {
       createQueryBuilder: jest.fn().mockReturnValue(queryBuilderMock),
       save: jest.fn(),
       update: jest.fn(),
+      findOneBy: jest.fn(),
+      delete: jest.fn(),
     } as unknown as jest.Mocked<Repository<ProductTypeOrmEntity>>;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -185,5 +187,44 @@ describe('ProductTypeOrmRepository', () => {
     await repository.bulkInsert(products);
 
     expect(productRepoMock.save).toHaveBeenCalledWith(expect.any(Array));
+  });
+
+  it('should return a product by SKU if found', async () => {
+    productRepoMock.findOneBy.mockResolvedValue(mockProductEntity);
+
+    const result = await repository.getBySku('123');
+
+    expect(productRepoMock.findOneBy).toHaveBeenCalledWith({ sku: '123' });
+    expect(mockProductEntity.convertToProductModel).toHaveBeenCalled();
+    expect(result).toEqual(
+      new Product({
+        sku: '123',
+        name: 'Test Product',
+        brand: 'Test Brand',
+        price: 100,
+        currency: 'USD',
+        stock: 10,
+        category: 'Test Category',
+        color: 'Blue',
+        model: 'Test Model',
+      }),
+    );
+  });
+
+  it('should return null if product by SKU is not found', async () => {
+    productRepoMock.findOneBy.mockResolvedValue(null);
+
+    const result = await repository.getBySku('unknown_sku');
+
+    expect(productRepoMock.findOneBy).toHaveBeenCalledWith({
+      sku: 'unknown_sku',
+    });
+    expect(result).toBeNull();
+  });
+
+  it('should delete a product by SKU', async () => {
+    await repository.deleteBySku('123');
+
+    expect(productRepoMock.delete).toHaveBeenCalledWith({ sku: '123' });
   });
 });
