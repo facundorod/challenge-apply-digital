@@ -1,73 +1,86 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# Challenge ApplyDigital API RESTful
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+## Overview
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+This project contains the API for the ApplyDigital challenge.
 
-## Description
+## Getting started
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+You'll need the following installed to run the application successfully:
 
-## Installation
+* Node version: >= 20.11.0
+* PNPM version: >= 8.15.1
+* Docker and docker-compose
+
+### Installation
 
 ```bash
-$ pnpm install
+git clone https://github.com/facundorod/challenge-apply-digital
+cd challenge-apply-digital
 ```
 
-## Running the app
+2. Create the environment configuration:
+
+- Create a .env file in the root directory using .env.example as a template.
+
+3. Dockerize application using docker-compose:
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+docker-compose up -d
 ```
 
-## Test
+3. Access the API:
+
+- Open your browser and navigate to the Swagger documentation to explore available endpoints:
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+http://localhost:3000/docs
 ```
 
-## Support
+### Running tests
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+1. Run unit test
+```bash
+docker-compose exec -it api pnpm run test
+```
 
-## Stay in touch
+2. Run the integration tests:
+```bash
+docker-compose exec -it api pnpm run test:e2e
+```
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+3. Run test coverage:
 
-## License
+```bash
+docker-compose exec -it api pnpm run test:cov
+```
 
-Nest is [MIT licensed](LICENSE).
+## Contributing
+
+The main branch contains the latest stable source code intended for production. All changes and features should be proposed via pull requests and tested through the CI pipeline.
+
+### Continuos Integration
+Each pull request triggers automated testing using GitHub Actions to ensure code quality and functionality are maintained. Any failing tests will block the merge.
+
+## Code Structure
+
+This project follows the principles of clean and hexagonal architecture, organizing code into distinct layers with a focus on maintainability, flexibility, and testability. The codebase is structured into three main folders:
+
+#### Domain (src/domain)
+This folder encapsulates the entities of the application. It defines the entities and dtos of the application.
+
+#### Infrastructure (src/infrastructure)
+The infrastructure folder contains the implementations of external interfaces defined in the domain layer. This layer serves as the bridge between the domain and external frameworks or services. Despite being the entry point for external communication, the code within this layer does not dictate the choice of frameworks or external dependencies, maintaining flexibility and allowing for easy adaptation to changes.
+
+#### Usecases (src/usecases)
+The usecases folder represents the application-specific use cases and orchestrators. It defines the use cases, entities, and business rules, serving as the heart of the application. Each use case is implemented through interfaces defined in the domain layer, ensuring loose coupling and easy replacement of components.
+* Note: The job to fetching products will be executed every hour. It's defined in src/infrastructure/jobs/fetchData.job.ts 
+
+### Key principles
+
+- Clean architecture: The project embraces the clean architecture principles, separating concerns and providing a clear and scalable structure for development.
+- Dependency Inversion: Dependencies are inverted to ensure that high-level modules (domain and usecases) do not depend on low-level modules (infrastructure). Instead, both depend on abstractions.
+- Framework Independence: The codebase is designed to be framework-agnostic, allowing for the adoption of different frameworks or libraries without affecting the core business logic.
+- Testability: The clean separation of concerns facilitates easy unit testing of business logic and use cases without the need for external dependencies.
+  
+This structure ensures that the application remains modular, maintainable, and adaptable to future changes or technology choices. Developers can focus on implementing business logic without being tied to specific frameworks or external dependencies.
