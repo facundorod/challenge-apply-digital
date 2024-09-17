@@ -9,9 +9,6 @@ services:
         POSTGRES_PASSWORD: ${DB_PASSWORD}
         POSTGRES_USER: ${DB_USERNAME}
         POSTGRES_DB: ${DB_NAME}
-    env_file:
-      - path: .env
-        required: true
     networks:
         - challenge_network
     volumes: 
@@ -26,9 +23,6 @@ services:
         dockerfile: Dockerfile.dev
     depends_on:
       - db
-    env_file:
-      - path: .env
-        required: true
     ports:
       - 3000:3000
     networks:
