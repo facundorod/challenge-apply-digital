@@ -22,6 +22,10 @@ import { BcryptModule } from '@/infrastructure/adapters/encryptation/bcrypt/bcry
 import { UserRepository } from '@/domain/ports/repositories/user.repository';
 import { EncryptationService } from '@/domain/ports/encryptation/encryptation.port';
 import { Register } from '@/usecases/authentication/register/register.usecase';
+import { JWTService } from '@/infrastructure/adapters/authentication/jwt/jwt.adapter';
+import { AuthenticationService } from '@/domain/ports/authentication/authentication.port';
+import { UserLogin } from '@/usecases/authentication/login/login.usecase';
+import { JWTModule } from '@/infrastructure/adapters/authentication/jwt/jwt.module';
 
 @Module({
   imports: [
@@ -30,6 +34,7 @@ import { Register } from '@/usecases/authentication/register/register.usecase';
     AxiosModule,
     RepositoriesModule,
     BcryptModule,
+    JWTModule,
   ],
 })
 export class UsecaseProxyModule {
@@ -38,6 +43,7 @@ export class UsecaseProxyModule {
   static readonly DELETE_PRODUCT_USE_CASE = 'DELETE_PRODUCT_USECASE';
   static readonly REPORTS_USE_CASE = 'REPORTS_USECASE';
   static readonly USER_REGISTER_USE_CASE = 'USER_REGISTER_USECASE';
+  static readonly USER_LOGIN_USE_CASE = 'USER_LOGIN_USECASE';
 
   static register(): DynamicModule {
     return {
@@ -99,6 +105,32 @@ export class UsecaseProxyModule {
             encryptation: EncryptationService,
           ) => new UseCaseProxy(new Register(logger, userRepo, encryptation)),
         },
+        {
+          provide: UsecaseProxyModule.USER_LOGIN_USE_CASE,
+          inject: [
+            WinstonAdapter,
+            UserTypeOrmRepository,
+            BCryptService,
+            JWTService,
+            NestConfigService,
+          ],
+          useFactory: (
+            logger: LoggerService,
+            userRepo: UserRepository,
+            encryptationService: EncryptationService,
+            authService: AuthenticationService,
+            envService: EnvironmentService,
+          ) =>
+            new UseCaseProxy(
+              new UserLogin(
+                logger,
+                userRepo,
+                authService,
+                encryptationService,
+                envService,
+              ),
+            ),
+        },
       ],
       exports: [
         UsecaseProxyModule.FETCH_PRODUCTS_USE_CASE,
@@ -106,6 +138,7 @@ export class UsecaseProxyModule {
         UsecaseProxyModule.DELETE_PRODUCT_USE_CASE,
         UsecaseProxyModule.REPORTS_USE_CASE,
         UsecaseProxyModule.USER_REGISTER_USE_CASE,
+        UsecaseProxyModule.USER_LOGIN_USE_CASE,
       ],
     };
   }

@@ -3,6 +3,7 @@ import { ProductFilterDto } from '@/domain/dtos/productFilter.dto';
 import { ReportsRequestDTO } from '@/domain/dtos/reportsRequest.dto';
 import { ReportsResponseDTO } from '@/domain/dtos/reportsResponse.dto';
 import { Product } from '@/domain/models/product.model';
+import { Public } from '@/infrastructure/configuration/decorators/public.decorator';
 import { UsecaseProxyModule } from '@/infrastructure/proxy/usecase/usecase-proxy.module';
 import { UseCaseProxy } from '@/infrastructure/proxy/usecase/usecase.proxy';
 import { GetAllProducts } from '@/usecases/get-products/get-products.usecase';
@@ -22,6 +23,7 @@ export class ProductsController {
   ) {}
 
   @Get('')
+  @Public()
   public async getAllProducts(
     @Query() filterProductDTO: ProductFilterDto,
   ): Promise<PaginatedDataDto<Product>> {
@@ -31,6 +33,7 @@ export class ProductsController {
   }
 
   @Delete(':sku')
+  @Public()
   public async deleteProduct(
     @Param('sku') sku: string,
   ): Promise<{ message: string }> {

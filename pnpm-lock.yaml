@@ -38,6 +38,9 @@ dependencies:
   class-validator:
     specifier: ^0.14.1
     version: 0.14.1
+  ms:
+    specifier: ^2.1.3
+    version: 2.1.3
   pg:
     specifier: ^8.12.0
     version: 8.12.0

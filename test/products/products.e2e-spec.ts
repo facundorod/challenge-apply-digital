@@ -8,11 +8,18 @@ import { ProductsController } from '@/infrastructure/controllers/products/produc
 import { Repository } from 'typeorm';
 import { Product } from '@/domain/models/product.model';
 import { DatabaseModule } from '@/infrastructure/configuration/database/database.module';
+import { JwtService } from '@nestjs/jwt';
+import { AuthGuard } from '@/infrastructure/guards/auth/auth.guard';
+import { APP_GUARD, Reflector } from '@nestjs/core';
+import { JWTModule } from '@/infrastructure/adapters/authentication/jwt/jwt.module';
+import { AuthenticationService } from '@/domain/ports/authentication/authentication.port';
+import { JWTService } from '@/infrastructure/adapters/authentication/jwt/jwt.adapter';
 
 describe('ProductsController (Integration)', () => {
   let app: INestApplication;
   let repository: Repository<ProductTypeOrmEntity>;
-
+  let jwtService: JwtService;
+  let validToken: string;
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
@@ -24,20 +31,44 @@ describe('ProductsController (Integration)', () => {
         }),
         TypeOrmModule.forFeature([ProductTypeOrmEntity]),
         UsecaseProxyModule.register(),
+        JWTModule,
+      ],
+      providers: [
+        {
+          provide: APP_GUARD,
+          inject: [JWTService, Reflector],
+          useFactory: (
+            jwtService: AuthenticationService,
+            reflector: Reflector,
+          ) => new AuthGuard(jwtService, reflector),
+        },
       ],
       controllers: [ProductsController],
     })
       .overrideModule(DatabaseModule)
       .useModule(jest.fn())
+      .overrideProvider(JwtService)
+      .useValue({
+        verifyAsync: jest.fn(),
+        sign: jest.fn(),
+      })
       .compile();
 
+    jwtService = moduleFixture.get<JwtService>(JwtService);
     app = moduleFixture.createNestApplication();
     repository = moduleFixture.get<Repository<ProductTypeOrmEntity>>(
       getRepositoryToken(ProductTypeOrmEntity),
     );
+
+    validToken = jwtService.sign({
+      id: 1,
+      email: 'testuser@example.com',
+    });
+
     app.useGlobalPipes(
       new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
     );
+
     await app.init();
   });
 
@@ -343,11 +374,20 @@ describe('ProductsController (Integration)', () => {
       });
     });
   });
+
   describe('GET /products/reports', () => {
+    it('should return an error if the user is not authenticated', async () => {
+      (jwtService.verifyAsync as jest.Mock).mockRejectedValueOnce(new Error());
+      const response = await supertest(app.getHttpServer())
+        .get('/products/reports')
+        .auth('invalidToken', { type: 'bearer' });
+      expect(response.status).toBe(401);
+    });
+
     it('should return the report with default values when no filters are provided', async () => {
-      const response = await supertest(app.getHttpServer()).get(
-        '/products/reports',
-      );
+      const response = await supertest(app.getHttpServer())
+        .get('/products/reports')
+        .auth(validToken, { type: 'bearer' });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('percentageOfDeletedProducts');
@@ -369,7 +409,8 @@ describe('ProductsController (Integration)', () => {
         .query({
           startDate: '2024-01-01',
           endDate: '2024-12-31',
-        });
+        })
+        .auth(validToken, { type: 'bearer' });
 
       expect(response.status).toBe(200);
       expect(
@@ -385,7 +426,8 @@ describe('ProductsController (Integration)', () => {
         .query({
           startDate: 'invalid-date',
           endDate: '2024-12-31',
-        });
+        })
+        .auth(validToken, { type: 'bearer' });
 
       expect(response.status).toBe(400);
       expect(response.body.message).toContain('startDate must be a valid date');
@@ -396,7 +438,8 @@ describe('ProductsController (Integration)', () => {
         .get('/products/reports')
         .query({
           endDate: '2024-12-31',
-        });
+        })
+        .auth(validToken, { type: 'bearer' });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('percentageOfDeletedProducts');
