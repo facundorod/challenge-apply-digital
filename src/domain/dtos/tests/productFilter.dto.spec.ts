@@ -1,5 +1,5 @@
 import { validate } from 'class-validator';
-import { ProductFilterDto } from './productFilter.dto';
+import { ProductFilterDto } from '../productFilter.dto';
 import { plainToInstance } from 'class-transformer';
 
 describe('ProductFilterDto', () => {

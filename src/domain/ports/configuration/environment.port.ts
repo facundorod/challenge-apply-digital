@@ -8,4 +8,7 @@ export interface EnvironmentService {
   getContentFulAPIAccessToken(): string;
   getContentFulAPIEnvironment(): string;
   getContentFulAPIContentType(): string;
+  getJWTSecret(): string;
+  getExpirationTime(): string;
+  getEncryptationSaltValue(): number;
 }

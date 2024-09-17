@@ -1,6 +1,6 @@
 import { validate } from 'class-validator';
 import { plainToClass } from 'class-transformer';
-import { ReportsRequestDTO } from './reportsRequest.dto';
+import { ReportsRequestDTO } from '../reportsRequest.dto';
 
 describe('ReportsRequestDTO', () => {
   it('should succeed with valid dates', async () => {

@@ -16,6 +16,12 @@ import { RepositoriesModule } from '@/infrastructure/adapters/repositories/repos
 import { GetAllProducts } from '@/usecases/get-products/get-products.usecase';
 import { RemoveProduct } from '@/usecases/remove-product/remove-product.usecase';
 import { Reports } from '@/usecases/reports/reports.usecase';
+import { UserTypeOrmRepository } from '@/infrastructure/adapters/repositories/user.repository';
+import { BCryptService } from '@/infrastructure/adapters/encryptation/bcrypt/bcrypt.adapter';
+import { BcryptModule } from '@/infrastructure/adapters/encryptation/bcrypt/bcrypt.module';
+import { UserRepository } from '@/domain/ports/repositories/user.repository';
+import { EncryptationService } from '@/domain/ports/encryptation/encryptation.port';
+import { Register } from '@/usecases/authentication/register/register.usecase';
 
 @Module({
   imports: [
@@ -23,6 +29,7 @@ import { Reports } from '@/usecases/reports/reports.usecase';
     WinstonModule,
     AxiosModule,
     RepositoriesModule,
+    BcryptModule,
   ],
 })
 export class UsecaseProxyModule {
@@ -30,6 +37,7 @@ export class UsecaseProxyModule {
   static readonly GET_ALL_PRODUCTS_USE_CASE = 'GET_ALL_PRODUCTS_USECASE';
   static readonly DELETE_PRODUCT_USE_CASE = 'DELETE_PRODUCT_USECASE';
   static readonly REPORTS_USE_CASE = 'REPORTS_USECASE';
+  static readonly USER_REGISTER_USE_CASE = 'USER_REGISTER_USECASE';
 
   static register(): DynamicModule {
     return {
@@ -82,12 +90,22 @@ export class UsecaseProxyModule {
             productRepository: ProductRepository,
           ) => new UseCaseProxy(new Reports(logger, productRepository)),
         },
+        {
+          provide: UsecaseProxyModule.USER_REGISTER_USE_CASE,
+          inject: [WinstonAdapter, UserTypeOrmRepository, BCryptService],
+          useFactory: (
+            logger: LoggerService,
+            userRepo: UserRepository,
+            encryptation: EncryptationService,
+          ) => new UseCaseProxy(new Register(logger, userRepo, encryptation)),
+        },
       ],
       exports: [
         UsecaseProxyModule.FETCH_PRODUCTS_USE_CASE,
         UsecaseProxyModule.GET_ALL_PRODUCTS_USE_CASE,
         UsecaseProxyModule.DELETE_PRODUCT_USE_CASE,
         UsecaseProxyModule.REPORTS_USE_CASE,
+        UsecaseProxyModule.USER_REGISTER_USE_CASE,
       ],
     };
   }
