@@ -7,11 +7,16 @@ import { TestingModule, Test } from '@nestjs/testing';
 import { TypeOrmModule, getRepositoryToken } from '@nestjs/typeorm';
 import supertest from 'supertest';
 import { Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 
-describe('ProductsController (Integration)', () => {
+jest.mock('bcrypt', () => ({
+  compare: jest.fn(),
+  hash: jest.fn(),
+  genSalt: jest.fn(),
+}));
+describe('AuthController (Integration)', () => {
   let app: INestApplication;
   let repository: Repository<UserTypeOrmEntity>;
-
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
@@ -83,7 +88,7 @@ describe('ProductsController (Integration)', () => {
       newUserEntity.password = 'encryptedpass';
       newUserEntity.name = 'Facundo';
       newUserEntity.surname = 'Rodriguez';
-      repository.insert(newUserEntity);
+      await repository.insert(newUserEntity);
       const response = await supertest(app.getHttpServer())
         .post('/auth/register')
         .send({
@@ -99,6 +104,9 @@ describe('ProductsController (Integration)', () => {
       });
     });
     it('should register the user successfully', async () => {
+      (bcrypt.hash as jest.Mock).mockResolvedValue('encrypted-pass');
+      (bcrypt.genSalt as jest.Mock).mockResolvedValue('salt-generated');
+
       const response = await supertest(app.getHttpServer())
         .post('/auth/register')
         .send({
@@ -107,11 +115,79 @@ describe('ProductsController (Integration)', () => {
           email: 'rodriguezfacundohernan+new@gmail.com',
           password: 'ApplyDigital2024',
         });
-
       expect(response.status).toBe(201);
       expect(response.body).toStrictEqual({
         message: 'User registered successfully',
       });
+    });
+  });
+  describe('POST /auth/login', () => {
+    it('should return validation error for invalid user email', async () => {
+      const response = await supertest(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'rodriguezfacundohernan',
+          password: 'ApplyDigital2024',
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body.message[0]).toContain('email must be an email');
+    });
+
+    it('should return validation error if the password is incorrect', async () => {
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+
+      const newUserEntity = new UserTypeOrmEntity();
+      newUserEntity.email = 'rodriguezfacundohernan@gmail.com';
+      newUserEntity.password = 'encryptedpass';
+      newUserEntity.name = 'Facundo';
+      newUserEntity.surname = 'Rodriguez';
+      await repository.insert(newUserEntity);
+
+      const response = await supertest(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'rodriguezfacundohernan@gmail.com',
+          password: 'wrongPassword',
+        });
+
+      expect(response.status).toBe(412);
+      expect(response.body.message).toContain('The password is incorrect');
+    });
+
+    it('should return validation error if the user does not exist', async () => {
+      const response = await supertest(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'invalidemail@gmail.com',
+          password: 'ApplyDigitalPass',
+        });
+
+      expect(response.status).toBe(404);
+      expect(response.body.message).toContain('The user email does not exist');
+    });
+
+    it('should return the accesstoken', async () => {
+      const newUserEntity = new UserTypeOrmEntity();
+      newUserEntity.email = 'rodriguezfacundohernan@gmail.com';
+      newUserEntity.password = 'encryptedpass';
+      newUserEntity.name = 'Facundo';
+      newUserEntity.surname = 'Rodriguez';
+      await repository.insert(newUserEntity);
+
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      const response = await supertest(app.getHttpServer())
+        .post('/auth/login')
+        .send({
+          email: 'rodriguezfacundohernan@gmail.com',
+          password: 'ApplyDigital2024',
+        });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('userToken');
+      expect(response.body).toHaveProperty('expirationDate');
+      expect(response.body).toHaveProperty('user');
     });
   });
 });
