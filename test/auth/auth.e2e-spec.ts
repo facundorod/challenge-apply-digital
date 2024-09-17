@@ -47,6 +47,7 @@ describe('AuthController (Integration)', () => {
 
   afterAll(async () => {
     await app.close();
+    jest.resetAllMocks();
   });
 
   beforeEach(async () => {

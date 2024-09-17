@@ -7,6 +7,12 @@ import { UseCaseProxy } from '@/infrastructure/proxy/usecase/usecase.proxy';
 import { LoginUseCase } from '@/usecases/authentication/login/login.interface';
 import { RegisterUseCase } from '@/usecases/authentication/register/register.interface';
 import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
@@ -20,6 +26,12 @@ export class AuthController {
   @Post('register')
   @HttpCode(201)
   @Public()
+  @ApiTags('Authentication')
+  @ApiOperation({ summary: 'User register' })
+  @ApiResponse({
+    status: 201,
+    description: 'User registered successfully',
+  })
   public async register(
     @Body() userRegisterDTO: RegisterDTO,
   ): Promise<{ message: string }> {
@@ -32,6 +44,12 @@ export class AuthController {
   @Post('login')
   @HttpCode(200)
   @Public()
+  @ApiTags('Authentication')
+  @ApiOperation({ summary: 'User login' })
+  @ApiOkResponse({
+    description: 'Access token information',
+    type: UserLoginResponse,
+  })
   public async login(
     @Body() userLoginDto: UserLoginDTO,
   ): Promise<UserLoginResponse> {

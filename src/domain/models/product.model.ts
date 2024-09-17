@@ -1,13 +1,64 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class Product {
+  @ApiProperty({
+    description: 'SKU of the product',
+    example: 'ABC123',
+  })
   private sku: string;
+
+  @ApiProperty({
+    description: 'Name of the product',
+    example: 'iPhone 12',
+  })
   private name: string;
+
+  @ApiProperty({
+    description: 'Brand of the product',
+    example: 'Apple',
+  })
   private brand: string;
+
+  @ApiProperty({
+    description: 'Model of the product',
+    example: 'iPhone 12 Pro',
+  })
   private model: string;
+
+  @ApiProperty({
+    description: 'Category of the product',
+    example: 'Smartphone',
+  })
   private category: string;
+
+  @ApiProperty({
+    description: 'Color of the product',
+    example: 'Black',
+  })
   private color: string;
+
+  @ApiProperty({
+    description: 'Price of the product',
+    example: 999.99,
+  })
   private price: number;
+
+  @ApiProperty({
+    description: 'Currency for the price',
+    example: 'USD',
+  })
   private currency: string;
+
+  @ApiProperty({
+    description: 'Stock quantity of the product',
+    example: 100,
+  })
   private stock: number;
+
+  @ApiProperty({
+    description: 'Whether the product is deleted or not',
+    example: false,
+  })
   private isDeleted: boolean;
 
   constructor({
