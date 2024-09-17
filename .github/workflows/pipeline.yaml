@@ -59,6 +59,9 @@ jobs:
           CONTENTFUL_API_ENVIRONMENT: ${{ secrets.CONTENTFUL_API_ENVIRONMENT }}
           CONTENTFUL_API_SPACEID: ${{ secrets.CONTENTFUL_API_SPACEID }}
           CONTENTFUL_API_URL: ${{ secrets.CONTENTFUL_API_URL }}
+          JWT_EXPIRATION_TIME: ${{ secrets.JWT_EXPIRATION_TIME }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          SALT_VALUE: ${{ secrets.SALT_VALUE }}
         steps:
             - uses: actions/checkout@v4
             - name: Use Node.js ${{ matrix.node-version }}
