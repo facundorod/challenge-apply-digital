@@ -2,7 +2,7 @@ import { RegisterDTO } from '@/domain/dtos/registerRequest.dto';
 import { UsecaseProxyModule } from '@/infrastructure/proxy/usecase/usecase-proxy.module';
 import { UseCaseProxy } from '@/infrastructure/proxy/usecase/usecase.proxy';
 import { RegisterUseCase } from '@/usecases/authentication/register/register.interface';
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, Inject, Post } from '@nestjs/common';
 
 @Controller('auth')
 export class AuthController {
@@ -12,6 +12,7 @@ export class AuthController {
   ) {}
 
   @Post('register')
+  @HttpCode(201)
   public async register(
     @Body() userRegisterDTO: RegisterDTO,
   ): Promise<{ message: string }> {
