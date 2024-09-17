@@ -1,6 +1,7 @@
 import { RegisterDTO } from '@/domain/dtos/registerRequest.dto';
 import { UserLoginDTO } from '@/domain/dtos/userLoginRequest.dto';
 import { UserLoginResponse } from '@/domain/dtos/userLoginResponse.dto';
+import { Public } from '@/infrastructure/configuration/decorators/public.decorator';
 import { UsecaseProxyModule } from '@/infrastructure/proxy/usecase/usecase-proxy.module';
 import { UseCaseProxy } from '@/infrastructure/proxy/usecase/usecase.proxy';
 import { LoginUseCase } from '@/usecases/authentication/login/login.interface';
@@ -18,6 +19,7 @@ export class AuthController {
 
   @Post('register')
   @HttpCode(201)
+  @Public()
   public async register(
     @Body() userRegisterDTO: RegisterDTO,
   ): Promise<{ message: string }> {
@@ -29,6 +31,7 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
+  @Public()
   public async login(
     @Body() userLoginDto: UserLoginDTO,
   ): Promise<UserLoginResponse> {
