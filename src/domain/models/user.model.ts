@@ -1,8 +1,24 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class User {
+  @ApiProperty({ description: 'Unique identifier for the user', example: '1' })
   private userId: number;
+  @ApiProperty({ description: 'First name of the user', example: 'John' })
   private name: string;
+
+  @ApiProperty({
+    description: 'User email address',
+    example: 'test@example.com',
+  })
   private email: string;
+
+  @ApiProperty({
+    description: 'User password',
+    example: 'password123',
+    type: 'password',
+  })
   private password: string;
+  @ApiProperty({ description: 'Last name of the user', example: 'Doe' })
   private surname: string;
 
   constructor(
