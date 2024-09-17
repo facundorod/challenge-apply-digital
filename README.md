@@ -8,8 +8,8 @@ This project contains the API for the ApplyDigital challenge.
 
 You'll need the following installed to run the application successfully:
 
-* Node version: >= 20.11.0
-* PNPM version: >= 8.15.1
+* Node version: >= 20.11.0 (to run locally)
+* PNPM version: >= 8.15.1 (to run locally)
 * Docker and docker-compose
 
 ### Installation
