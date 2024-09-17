@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Between, MoreThan, Repository, SelectQueryBuilder } from 'typeorm';
-import { ProductTypeOrmRepository } from './product.repository';
+import { ProductTypeOrmRepository } from '../product.repository';
 import { ProductTypeOrmEntity } from '@/infrastructure/configuration/database/entities/product.entity';
 import { Product } from '@/domain/models/product.model';
 import { getRepositoryToken } from '@nestjs/typeorm';

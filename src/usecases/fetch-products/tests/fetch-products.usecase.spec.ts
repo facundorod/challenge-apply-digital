@@ -45,7 +45,7 @@ describe('Fetch products usecase', () => {
       getContentFulAPIEnvironment: jest.fn(),
       getContentFulAPISpaceId: jest.fn(),
       getContentFulAPIURL: jest.fn(),
-    };
+    } as unknown as jest.Mocked<EnvironmentService>;
 
     fetchProducts = new FetchProducts(
       loggerService,

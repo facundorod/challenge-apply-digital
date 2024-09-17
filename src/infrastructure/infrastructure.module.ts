@@ -7,6 +7,8 @@ import { RepositoriesModule } from './adapters/repositories/repositories.module'
 import { UsecaseProxyModule } from './proxy/usecase/usecase-proxy.module';
 import { JobsModule } from './jobs/jobs.module';
 import { ControllersModule } from './controllers/controllers.module';
+import { JWTModule } from './adapters/authentication/jwt/jwt.module';
+import { BcryptModule } from './adapters/encryptation/bcrypt/bcrypt.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ControllersModule } from './controllers/controllers.module';
     UsecaseProxyModule,
     JobsModule,
     ControllersModule,
+    JWTModule,
+    BcryptModule,
   ],
 })
 export class InfrastructureModule {}

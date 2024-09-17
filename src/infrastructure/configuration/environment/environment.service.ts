@@ -7,6 +7,18 @@ import { ConfigService } from '@nestjs/config';
 export class NestConfigService implements EnvironmentService {
   constructor(private readonly configService: ConfigService) {}
 
+  getEncryptationSaltValue(): number {
+    return this.configService.getOrThrow<number>('SALT_VALUE');
+  }
+
+  getJWTSecret(): string {
+    return this.configService.getOrThrow<string>('JWT_SECRET');
+  }
+
+  getExpirationTime(): string {
+    return this.configService.getOrThrow<string>('JWT_EXPIRATION_TIME');
+  }
+
   getContentFulAPIURL(): string {
     return this.configService.getOrThrow<string>('CONTENTFUL_API_URL');
   }
